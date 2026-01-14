@@ -10,7 +10,8 @@
 <body>
    
 <div class="container">
-    
+
+        <img src="../assets/images/solano1.png" alt="MMO Logo" class="logo" />
         <h1>IT Service Request System</h1>
 
     <div>
@@ -31,7 +32,7 @@
         <div class="modal-content" id="technician-modal-content">
             <span class="close" id="close-technician-modal">&times;</span>
             <h2>Technician Login</h2>
-            <form action="" method="POST">
+            <form action="./../../backend/config/login.php" method="POST">
                 <div id="technician-login">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" required />
@@ -39,7 +40,7 @@
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" required />
                 </div>
-                <button type="submit" onClick="loginTechnician()">Login</button>
+                <button type="submit" onClick="submit">Login</button>
             </form>
         </div>
     </div>

@@ -1,1 +1,0 @@
-console.log('bacnkend index.js loaded');

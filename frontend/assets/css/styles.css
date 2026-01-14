@@ -49,10 +49,18 @@ body {
 }
 
 
+img {
+    display: block;
+    margin: 0 auto 20px auto;
+    max-width: 150px;
+    height: auto;
+}
 
 h1 {
     color: #f6f6f6;
     text-align: center;
+    height: 100px;
+    width: 100%;
     margin-top: 20px;
     font-size: 36px;
 }
