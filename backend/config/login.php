@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // MD5 password check
     $hashed = md5($password);
 
-    $stmt = $conn->prepare("
+    $stmt = $pdo->prepare("
         SELECT *
         FROM users 
         WHERE username = ? AND password = ?
@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         echo "<script>
             alert('Invalid username or password');
-            window.location.href='index.php';
+            window.location.href='../../frontend/pages/index.php';
         </script>";
     }
 }

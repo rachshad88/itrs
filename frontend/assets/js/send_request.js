@@ -18,3 +18,27 @@ window.addEventListener('click', function (e) {
         requestModal.style.display = "none";
     }
 });
+
+//para gumana yung submit request button sa index.php
+document.getElementById("requestForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch("../../backend/requests/send_request.php", {
+        method: "POST",
+        body: formData
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Request submitted!\nTicket: " + data.request_code);
+                this.reset();
+                document.getElementById("request-modal").style.display = "none";
+            } else {
+                alert("Failed to submit request");
+            }
+        })
+        .catch(() => alert("Server error"));
+});
+

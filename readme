@@ -29,3 +29,10 @@ CREATE TABLE requests (
     FOREIGN KEY (assigned_to) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+i-run mo to sa cmd
+php -S 0.0.0.0:8000
+
+ipconfig - get the IPv4 Address
+
+pati ito i-run mo
+ngrok http 8000

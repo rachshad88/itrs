@@ -51,7 +51,7 @@
         <div class="modal-content" id="request-modal-content">
             <span class="close" id="close-request-modal">&times;</span>
             <h2>Send Service Request</h2>
-            <form action="" method="POST">
+            <form action="" id="requestForm" method="POST">
                 <div id="service-request-form">
                     <label for="client_name">Client Name:</label>
                     <input type="text" id="client_name" name="client_name" required />
@@ -84,13 +84,10 @@
                     <label for="recommendation">Recommendation</label>
                     <input type="text" id="recommendation" name="recommendation" />
 
-                    <label for="technician">Assign Technician:</label>
-                    <select id="technician" name="technician" required>
-                        
                     </select>
 
                 </div>
-                <button type="submit" onClick="sendRequest()">Submit Request</button>
+                <button type="submit">Submit Request</button>
             </form>
         </div>
     </div>

@@ -2,11 +2,12 @@
 session_start();
 require_once "../../backend/config/db.php";
 
-// Protect Page
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../frontend/pages/index.php");
+// Protect Page para di masearch
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
+    header("Location: dashboard.php");
     exit;
 }
+
 
 $message = "";
 
@@ -67,7 +68,7 @@ if (isset($_POST['update_user'])) {
 }
 
 // FETCH USERS
-$users = $conn->query("SELECT * FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo->query("SELECT * FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,0 +1,102 @@
+/* navbar.css */
+
+/* Basic navbar styling */
+.navbar {
+  display: flex; /* Align logo, message, and links horizontally */
+  align-items: center; /* Vertical alignment */
+  justify-content: space-between; /* Space between left (logo + message) and right (links) */
+  padding: 0 20px;
+  height: 70px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+/* Logo styling */
+.navbar .logo {
+  height: 50px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.navbar .logo:hover {
+  transform: scale(1.05);
+}
+
+/* Welcome message next to logo */
+.navbar p {
+  text-transform: capitalize;
+  font-weight: bold;
+  margin-right: auto; /* Space between logo and message */
+  text-decoration: none;
+  color: #333333;
+  font-weight: 500;
+  padding: 10px 15px;
+  font-size: larger;
+}
+
+.navbar p strong {
+  font-weight: 600; /* Highlight the username */
+  color: #007aff; /* iOS blue highlight for name */
+}
+
+/* Container for logo + message on left side */
+.navbar .logo + p {
+  display: inline-block; /* Align message with logo */
+}
+
+/* Navigation links container */
+.navbar .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual nav link styling */
+.navbar .nav-links li a {
+  text-decoration: none;
+  color: #333333;
+  font-weight: 500;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Hover effect for links */
+.navbar .nav-links li a:hover {
+  background-color: #f0f0f0;
+  color: #007aff;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column; /* Stack logo/message and nav links */
+    align-items: flex-start;
+    height: auto;
+    padding: 10px 20px;
+  }
+
+  .navbar .logo + p {
+    margin-left: 0; /* Remove horizontal margin */
+    margin-top: 5px; /* Slight space below logo */
+  }
+
+  .navbar .nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .navbar .nav-links li a {
+    width: 100%;
+    text-align: center;
+  }
+}

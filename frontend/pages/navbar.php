@@ -3,10 +3,16 @@
 // session_start(); // make sure session is started
 $user_role = $_SESSION['role'] ?? ''; // get role from session
 ?>
+<link rel="stylesheet" href="../../frontend/assets/css/navbar.css">
 <nav class="navbar">
     <img src="../assets/images/solano1.png" alt="MMO Logo" class="logo" />
+    <p>
+        Welcome to your dashboard,
+        <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
+    </p>
     <ul class="nav-links">
         <li><a href="dashboard.php">Dashboard</a></li>
+        
         <li><a href="reports.php">Accomplishment Reports</a></li>
         
         <?php if ($user_role === 'TECHNICIAN'): ?>

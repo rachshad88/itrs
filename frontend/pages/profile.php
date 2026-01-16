@@ -3,14 +3,14 @@ session_start();
 require_once "../../backend/config/db.php";
 
 // Protect Page
-if (!isset($_SESSION['user_id'])) {
-    header("Location:index.php");
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'TECHNICIAN') {
+    header("Location: dashboard.php");
     exit;
 }
 
 // Fetch current user info
 $user_id = $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT * FROM users WHERE id = :id");
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id");
 $stmt->execute([':id' => $user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -44,7 +44,7 @@ if (isset($_POST['update_profile']) && $can_edit) {
 
     try {
         $sql = "UPDATE users SET full_name=:full_name, username=:username $password_sql WHERE id=:id";
-        $stmt = $conn->prepare($sql);
+        $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $message = "Profile updated successfully!";
         // Refresh session username
@@ -54,7 +54,7 @@ if (isset($_POST['update_profile']) && $can_edit) {
     }
 
     // Refresh user data
-    $stmt = $conn->prepare("SELECT * FROM users WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id");
     $stmt->execute([':id' => $user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 }
