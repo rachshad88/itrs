@@ -7,7 +7,7 @@
   justify-content: space-between; /* Space between left (logo + message) and right (links) */
   padding: 0 20px;
   height: 70px;
-  background-color: #ffffff;
+  background-color: #f9f8f6;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;

@@ -23,6 +23,22 @@ ORDER BY created_at DESC
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$userId]);
 $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Status counters for this technician
+$countSql = "
+SELECT 
+    SUM(status = 'PENDING' AND assigned_to IS NULL) AS pending_count,
+    SUM(status = 'IN_PROGRESS' AND assigned_to = ?) AS progress_count,
+    SUM(status = 'DONE' AND assigned_to = ?) AS done_count
+FROM requests
+";
+
+
+
+$countStmt = $pdo->prepare($countSql);
+$countStmt->execute([$userId, $userId]);
+$counts = $countStmt->fetch();
+
 ?>
 
 
@@ -39,8 +55,25 @@ $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <?php include __DIR__ . '/navbar.php'; ?>
 
-<div class="main-content">
-    <h1>Technician Dashboard</h1>
+    <div class="main-content">
+        <h1>Technician Dashboard</h1>
+
+        <div class="stats-boxes">
+        <div class="stat-card">
+            <h3>Pending</h3>
+            <p><?= $counts['pending_count'] ?? 0 ?></p>
+        </div>
+
+        <div class="stat-card">
+            <h3>In Progress</h3>
+            <p><?= $counts['progress_count'] ?? 0 ?></p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Completed</h3>
+            <p><?= $counts['done_count'] ?? 0 ?></p>
+        </div>
+    </div>
 
     <table border="1" cellpadding="10">
         <thead>
@@ -50,6 +83,7 @@ $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>Office</th>
                 <th>Issue</th>
                 <th>Status</th>
+                <th>Created</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -61,6 +95,7 @@ $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <td><?= htmlspecialchars($r['office']) ?></td>
     <td><?= htmlspecialchars($r['issue']) ?></td>
     <td><?= $r['status'] ?></td>
+    <td><?= htmlspecialchars($r['created_at']) ?></td>
     <td>
        <?php if ($r['assigned_to'] == null): ?>
         <form action="../../backend/requests/accept_request.php" method="POST">

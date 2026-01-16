@@ -64,7 +64,7 @@ if (isset($_POST['update_profile']) && $can_edit) {
 <head>
 <meta charset="UTF-8">
 <title>Profile</title>
-<link rel="stylesheet" href="../../frontend/assets/css/dashboard.css">
+<link rel="stylesheet" href="../../frontend/assets/css/profile.css">
 </head>
 <body>
 

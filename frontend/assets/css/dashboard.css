@@ -1,6 +1,165 @@
-/* Main content area */
+/* dashboard.css */
+
+/* Page base styling */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f5f6fa; /* Light app background */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: #333;
+}
+
+/* Main container */
 .main-content {
+  max-width: 1200px; /* Limit width for readability */
+  margin: 40px auto; /* Center horizontally */
+  padding: 30px;
+  background: #f9f8f6;
+  border-radius: 16px; /* iOS rounded corners */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Page title */
+.main-content h1 {
+  margin-bottom: 25px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Table layout */
+table {
+  width: 100%;
+  border-collapse: collapse; /* Remove double borders */
+  background: #ffffff;
+}
+
+/* Table header */
+thead {
+  background-color: #f0f2f7;
+}
+
+thead th {
+  padding: 14px;
+  text-align: left;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #555;
+}
+
+/* Table body */
+tbody td {
+  padding: 14px;
+  border-top: 1px solid #e6e6e6;
+  font-size: 15px;
+}
+
+/* Row hover effect */
+tbody tr:hover {
+  background-color: #f9fafc;
+}
+
+/* Status text emphasis */
+td:nth-child(5) {
+  font-weight: 600;
+}
+
+/* Action column */
+td:last-child {
+  text-align: center;
+}
+
+/* Accept button */
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007aff; /* iOS blue */
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+/* Button hover */
+button:hover {
+  background-color: #005fcc;
+  transform: scale(1.05);
+}
+
+/* Button active */
+button:active {
+  transform: scale(0.97);
+}
+
+/* Assigned label */
+td:last-child {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Responsive handling */
+@media (max-width: 768px) {
+  .main-content {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  thead {
+    display: none; /* Hide headers for mobile */
+  }
+
+  tbody tr {
+    display: block;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    border: none;
+  }
+
+  tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+.stats-boxes {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  flex: 1;
+  background: #ffffff;
   padding: 20px;
-  background-color: #f9f9f9;
-  min-height: calc(100vh - 80px);
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 1px 4px 10px rgba(0.1, 0.1, 0.1, 0.1);
+}
+
+.stat-card h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.stat-card p {
+  font-size: 32px;
+  margin: 10px 0 0;
+  font-weight: bold;
 }
