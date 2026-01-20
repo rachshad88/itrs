@@ -1,44 +1,29 @@
-const openRequestModalBtn = document.getElementById('open-request-modal');
-const closeRequestModalBtn = document.getElementById('close-request-modal');
-const requestModal = document.getElementById('request-modal');
-
-// Open the modal when the open button is clicked
-openRequestModalBtn.onclick = function () {
-    requestModal.style.display = "block";
-}
-
-// Close the modal when the close button is clicked
-closeRequestModalBtn.onclick = function () {
-    requestModal.style.display = "none";
-}
-
-// Close the modal when clicking outside of it
-window.addEventListener('click', function (e) {
-    if (e.target == requestModal) {
-        requestModal.style.display = "none";
-    }
-});
-
 //para gumana yung submit request button sa index.php
 document.getElementById("requestForm").addEventListener("submit", function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const formData = new FormData(this);
+  const formData = new FormData(this);
 
-    fetch("../../backend/requests/send_request.php", {
-        method: "POST",
-        body: formData
+  fetch("../../backend/requests/send_request.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status === "success") {
+        alert("Request submitted successfully with code: " + data.request_code);
+        // Clear the form
+        document.getElementById("requestForm").reset();
+        // Redirect to requested page
+        setTimeout(() => {
+          window.location.href = "../../frontend/pages/requested.php";
+        }, 1000);
+      } else {
+        alert("Failed to submit request: " + (data.message || "Unknown error"));
+      }
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                alert("Request submitted!\nTicket: " + data.request_code);
-                this.reset();
-                document.getElementById("request-modal").style.display = "none";
-            } else {
-                alert("Failed to submit request");
-            }
-        })
-        .catch(() => alert("Server error"));
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("Server error");
+    });
 });
-

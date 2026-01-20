@@ -17,19 +17,17 @@ if (isset($_POST['add_user'])) {
     $username = $_POST['username'];
     $password = md5($_POST['password']); // MD5 hash
     $role = $_POST['role'];
-    $status = $_POST['status'];
 
     try {
-        $stmt = $conn->prepare("
-            INSERT INTO users(username, password, full_name, role, status)
-            VALUES (:username, :password, :full_name, :role, :status)
+        $stmt = $pdo->prepare("
+            INSERT INTO users(username, password, full_name, role)
+            VALUES (:username, :password, :full_name, :role)
         ");
         $stmt->execute([
             ':username' => $username,
             ':password' => $password,
             ':full_name' => $full_name,
             ':role' => $role,
-            ':status' => $status
         ]);
         $message = "User added successfully!";
     } catch (PDOException $e) {
@@ -43,7 +41,6 @@ if (isset($_POST['update_user'])) {
     $full_name = $_POST['full_name'];
     $username = $_POST['username'];
     $role = $_POST['role'];
-    $status = $_POST['status'];
 
     try {
         $stmt = $conn->prepare("
@@ -51,14 +48,12 @@ if (isset($_POST['update_user'])) {
                 username=:username,
                 full_name=:full_name,
                 role=:role,
-                status=:status
             WHERE id=:id
         ");
         $stmt->execute([
             ':username' => $username,
             ':full_name' => $full_name,
             ':role' => $role,
-            ':status' => $status,
             ':id' => $id
         ]);
         $message = "User updated successfully!";
@@ -104,7 +99,6 @@ button { cursor: pointer; }
     <th>Name</th>
     <th>Username</th>
     <th>Role</th>
-    <th>Status</th>
     <th>Action</th>
 </tr>
 </thead>
@@ -115,14 +109,13 @@ button { cursor: pointer; }
 <td><?= $u['full_name'] ?></td>
 <td><?= $u['username'] ?></td>
 <td><?= $u['role'] ?></td>
-<td><?= $u['status'] ?></td>
 <td>
     <button class="editBtn"
         data-id="<?= $u['id'] ?>"
         data-full_name="<?= htmlspecialchars($u['full_name']) ?>"
         data-username="<?= htmlspecialchars($u['username']) ?>"
         data-role="<?= $u['role'] ?>"
-        data-status="<?= $u['status'] ?>">Edit</button>
+    >Edit</button>
 </td>
 </tr>
 <?php endforeach; ?>
@@ -142,11 +135,7 @@ button { cursor: pointer; }
                 <option disabled selected>Select Role</option>
                 <option value="ADMIN">ADMIN</option>
                 <option value="TECHNICIAN">TECHNICIAN</option>
-            </select>
-            <select name="status" required>
-                <option disabled selected>Select Status</option>
-                <option value="AVAILABLE">AVAILABLE</option>
-                <option value="BUSY">BUSY</option>
+                <option value="CLIENT">CLIENT</option>
             </select>
             <button type="submit" name="add_user">Add Employee</button>
         </form>
@@ -165,10 +154,7 @@ button { cursor: pointer; }
             <select name="role" id="edit_role">
                 <option value="ADMIN">ADMIN</option>
                 <option value="TECHNICIAN">TECHNICIAN</option>
-            </select>
-            <select name="status" id="edit_status">
-                <option value="AVAILABLE">AVAILABLE</option>
-                <option value="BUSY">BUSY</option>
+                <option value="CLIENT">CLIENT</option>
             </select>
             <button type="submit" name="update_user">Update Employee</button>
         </form>
@@ -196,7 +182,6 @@ Array.from(editButtons).forEach(btn => {
         document.getElementById("edit_full_name").value = this.dataset.full_name;
         document.getElementById("edit_username").value = this.dataset.username;
         document.getElementById("edit_role").value = this.dataset.role;
-        document.getElementById("edit_status").value = this.dataset.status;
         editModal.style.display = "block";
     }
 });

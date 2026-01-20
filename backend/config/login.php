@@ -25,9 +25,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["full_name"] = $user["full_name"];
         $_SESSION["role"] = $user["role"];
 
-        // redirect to dashboard
-        header("Location:../../frontend/pages/dashboard.php");
-        exit;
+        // Redirect based on role
+        if ($user["role"] === "CLIENT") {
+            header("Location: ../../frontend/pages/request.php");
+            exit;
+        } else {
+            // For admin or other roles, go to dashboard
+            header("Location: ../../frontend/pages/dashboard.php");
+            exit;
+        }
     } else {
         echo "<script>
             alert('Invalid username or password');
@@ -35,4 +41,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </script>";
     }
 }
-?>

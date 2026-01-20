@@ -11,11 +11,24 @@ $user_role = $_SESSION['role'] ?? ''; // get role from session
         <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
     </p>
     <ul class="nav-links">
+
+        <?php if ($user_role === 'ADMIN' || $user_role === 'TECHNICIAN'): ?>
         <li><a href="dashboard.php">Dashboard</a></li>
-        
+        <?php endif; ?>
+
+        <?php if ($user_role === 'CLIENT'): ?>
+        <li><a href="request.php">Request Form</a></li>
+        <?php endif; ?>
+
+         <?php if ($user_role === 'CLIENT'): ?>
+        <li><a href="requested.php">Requested</a></li>
+        <?php endif; ?>
+
+         <?php if ($user_role === 'TECHNICIAN'): ?>
         <li><a href="reports.php">Accomplishment Reports</a></li>
-        
-        <?php if ($user_role === 'TECHNICIAN'): ?>
+         <?php endif; ?>
+
+        <?php if ($user_role === 'TECHNICIAN' || $user_role === 'CLIENT'): ?>
             <li><a href="profile.php">Profile</a></li>
         <?php endif; ?>
 

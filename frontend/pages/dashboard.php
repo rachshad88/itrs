@@ -2,7 +2,7 @@
 session_start();
 require "../../backend/config/db.php";
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'TECHNICIAN') {
     header("Location: ../../frontend/pages/index.php");
     exit;
 }
@@ -29,14 +29,15 @@ $countSql = "
 SELECT 
     SUM(status = 'PENDING' AND assigned_to IS NULL) AS pending_count,
     SUM(status = 'IN_PROGRESS' AND assigned_to = ?) AS progress_count,
-    SUM(status = 'DONE' AND assigned_to = ?) AS done_count
+    SUM(status = 'DONE' AND assigned_to = ?) AS done_count,
+    SUM(finished = 'repaired' AND assigned_to = ?) AS repaired_count,
+    SUM(finished = 'beyond repair' AND assigned_to = ?) AS beyond_repair_count
 FROM requests
 ";
 
 
-
 $countStmt = $pdo->prepare($countSql);
-$countStmt->execute([$userId, $userId]);
+$countStmt->execute([$userId, $userId, $userId, $userId]);
 $counts = $countStmt->fetch();
 
 ?>
@@ -50,10 +51,10 @@ $counts = $countStmt->fetch();
     <title>MMO IT Service Request Dashboard</title>
     <link rel="stylesheet" href="../assets/css/dashboard.css">
 </head>
-
+<?php include __DIR__ . '/navbar.php'; ?>
 <body>
 
-<?php include __DIR__ . '/navbar.php'; ?>
+
 
     <div class="main-content">
         <h1>Technician Dashboard</h1>
@@ -73,6 +74,17 @@ $counts = $countStmt->fetch();
             <h3>Completed</h3>
             <p><?= $counts['done_count'] ?? 0 ?></p>
         </div>
+
+        <div class="stat-card">
+            <h3>Repaired</h3>
+            <p><?= $counts['repaired_count'] ?? 0 ?></p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Beyond Repair</h3>
+            <p><?= $counts['beyond_repair_count'] ?? 0 ?></p>
+        </div>
+
     </div>
 
     <table border="1" cellpadding="10">
@@ -84,6 +96,7 @@ $counts = $countStmt->fetch();
                 <th>Issue</th>
                 <th>Status</th>
                 <th>Created</th>
+                <th>Completed</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -96,6 +109,7 @@ $counts = $countStmt->fetch();
     <td><?= htmlspecialchars($r['issue']) ?></td>
     <td><?= $r['status'] ?></td>
     <td><?= htmlspecialchars($r['created_at']) ?></td>
+    <td><?= htmlspecialchars($r['completed_at']) ?></td>
     <td>
        <?php if ($r['assigned_to'] == null): ?>
         <form action="../../backend/requests/accept_request.php" method="POST">

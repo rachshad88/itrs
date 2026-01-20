@@ -1,0 +1,87 @@
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Form layout */
+#technician-login,
+#service-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Labels */
+label {
+  font-size: 13px;
+  text-align: left;
+  color: #00458f;
+  font-weight: bold;
+}
+
+h2 {
+  text-align: center;
+  color: #00458f;
+}
+/* Inputs and selects */
+input,
+select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.15);
+}
+button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  margin-top: 10px;
+  background: #007aff;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+button:hover {
+  background: #005fcc;
+  transform: scale(1.05);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile support */
+@media (max-width: 480px) {
+  .container {
+    padding: 30px;
+  }
+
+  .container > div {
+    flex-direction: column;
+  }
+}

@@ -3,7 +3,7 @@ session_start();
 require_once "../../backend/config/db.php";
 
 // Protect Page
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'TECHNICIAN') {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'TECHNICIAN' && $_SESSION['role'] !== 'CLIENT')) {
     header("Location: dashboard.php");
     exit;
 }
