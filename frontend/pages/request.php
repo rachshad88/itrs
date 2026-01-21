@@ -25,8 +25,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'CLIENT') {
 
             <form action="" id="requestForm" method="POST">
                 <div id="service-request-form">
-                    <label for="client_name">Client Name:</label>
-                    <input type="text" id="client_name" name="client_name" required />
 
                     <label for="office">Office:</label>
                     <input type="text" id="office" name="office" required />
@@ -49,12 +47,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'CLIENT') {
 
                     <label for="issue">Issue Description:</label>
                     <input type="text" id="issue" name="issue" required />
-
-                    <label for="remarks">Remarks</label>
-                    <input type="text" id="remarks" name="remarks" />
-
-                    <label for="recommendation">Recommendation</label>
-                    <input type="text" id="recommendation" name="recommendation" />
 
                 </div>
                 <button type="submit">Submit Request</button>

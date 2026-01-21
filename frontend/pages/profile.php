@@ -25,13 +25,17 @@ if ($user['role'] === 'ADMIN') {
 // Handle update form submission
 $message = '';
 if (isset($_POST['update_profile']) && $can_edit) {
-    $full_name = $_POST['full_name'];
+    $first_name = $_POST['first_name'];
+    $middle_name = $_POST['middle_name'] ?? null;
+    $last_name = $_POST['last_name'];
     $username = $_POST['username'];
 
     // Optional: update password if provided
     $password_sql = '';
     $params = [
-        ':full_name' => $full_name,
+        ':first_name' => $first_name,
+        ':middle_name' => $middle_name,
+        ':last_name' => $last_name,
         ':username' => $username,
         ':id' => $user_id
     ];
@@ -43,12 +47,15 @@ if (isset($_POST['update_profile']) && $can_edit) {
     }
 
     try {
-        $sql = "UPDATE users SET full_name=:full_name, username=:username $password_sql WHERE id=:id";
+        $sql = "UPDATE users SET first_name=:first_name, middle_name=:middle_name, last_name=:last_name, username=:username $password_sql WHERE id=:id";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $message = "Profile updated successfully!";
         // Refresh session username
         $_SESSION['username'] = $username;
+        $_SESSION['first_name'] = $first_name;
+        $_SESSION['middle_name'] = $middle_name;
+        $_SESSION['last_name'] = $last_name;
     } catch (PDOException $e) {
         $message = "Error: " . $e->getMessage();
     }
@@ -71,14 +78,20 @@ if (isset($_POST['update_profile']) && $can_edit) {
 <?php include __DIR__ . '/navbar.php'; ?>
 
 <div class="main-content">
-    <h1>Your Profile</h1>
+    <h1>Edit Profile</h1>
 
     <?php if (!empty($message)) echo "<p style='color:green;'>$message</p>"; ?>
 
     <?php if ($can_edit): ?>
     <form method="POST">
-        <label>Full Name:</label><br>
-        <input type="text" name="full_name" value="<?= htmlspecialchars($user['full_name']) ?>" required><br><br>
+        <label>First Name:</label><br>
+        <input type="text" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" required><br><br>
+
+        <label>Middle Name (Optional):</label><br>
+        <input type="text" name="middle_name" value="<?= htmlspecialchars($user['middle_name'] ?? '') ?>"><br><br>
+
+        <label>Last Name:</label><br>
+        <input type="text" name="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" required><br><br>
 
         <label>Username:</label><br>
         <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required><br><br>

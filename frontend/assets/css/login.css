@@ -1,3 +1,9 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #feac5e, #c779d0, #4bc0c8);
+  min-height: 100vh;
+}
+
 .container {
   max-width: 400px;
   margin: 50px auto;

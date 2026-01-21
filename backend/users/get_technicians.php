@@ -2,7 +2,7 @@
 require_once "../config/db.php";
 
 $stmt = $pdo->query("
-    SELECT id, full_name
+    SELECT id, CONCAT(first_name, ' ', COALESCE(middle_name, ''), ' ', last_name) AS full_name
     FROM users
     WHERE role = 'TECHNICIAN'
 ");

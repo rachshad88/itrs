@@ -18,4 +18,5 @@
             </form>
     </div>
 
+
         <script src="../assets/js/technician_login.js"></script>

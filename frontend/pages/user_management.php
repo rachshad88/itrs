@@ -13,20 +13,24 @@ $message = "";
 
 // ADD USER
 if (isset($_POST['add_user'])) {
-    $full_name = $_POST['full_name'];
+    $first_name = $_POST['first_name'];
+    $middle_name = $_POST['middle_name'] ?? null;
+    $last_name = $_POST['last_name'];
     $username = $_POST['username'];
     $password = md5($_POST['password']); // MD5 hash
     $role = $_POST['role'];
 
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO users(username, password, full_name, role)
-            VALUES (:username, :password, :full_name, :role)
+            INSERT INTO users(username, password, first_name, middle_name, last_name, role)
+            VALUES (:username, :password, :first_name, :middle_name, :last_name, :role)
         ");
         $stmt->execute([
             ':username' => $username,
             ':password' => $password,
-            ':full_name' => $full_name,
+            ':first_name' => $first_name,
+            ':middle_name' => $middle_name,
+            ':last_name' => $last_name,
             ':role' => $role,
         ]);
         $message = "User added successfully!";
@@ -38,21 +42,27 @@ if (isset($_POST['add_user'])) {
 // UPDATE USER
 if (isset($_POST['update_user'])) {
     $id = $_POST['id'];
-    $full_name = $_POST['full_name'];
+    $first_name = $_POST['first_name'];
+    $middle_name = $_POST['middle_name'] ?? null;
+    $last_name = $_POST['last_name'];
     $username = $_POST['username'];
     $role = $_POST['role'];
 
     try {
-        $stmt = $conn->prepare("
+        $stmt = $pdo->prepare("
             UPDATE users SET 
                 username=:username,
-                full_name=:full_name,
-                role=:role,
+                first_name=:first_name,
+                middle_name=:middle_name,
+                last_name=:last_name,
+                role=:role
             WHERE id=:id
         ");
         $stmt->execute([
             ':username' => $username,
-            ':full_name' => $full_name,
+            ':first_name' => $first_name,
+            ':middle_name' => $middle_name,
+            ':last_name' => $last_name,
             ':role' => $role,
             ':id' => $id
         ]);
@@ -103,16 +113,20 @@ button { cursor: pointer; }
 </tr>
 </thead>
 <tbody>
-<?php foreach ($users as $u): ?>
+<?php foreach ($users as $u): 
+    $fullName = $u['first_name'] . ' ' . ($u['middle_name'] ? $u['middle_name'] . ' ' : '') . $u['last_name'];
+?>
 <tr>
 <td><?= $u['id'] ?></td>
-<td><?= $u['full_name'] ?></td>
-<td><?= $u['username'] ?></td>
+<td><?= htmlspecialchars($fullName) ?></td>
+<td><?= htmlspecialchars($u['username']) ?></td>
 <td><?= $u['role'] ?></td>
 <td>
     <button class="editBtn"
         data-id="<?= $u['id'] ?>"
-        data-full_name="<?= htmlspecialchars($u['full_name']) ?>"
+        data-first_name="<?= htmlspecialchars($u['first_name']) ?>"
+        data-middle_name="<?= htmlspecialchars($u['middle_name'] ?? '') ?>"
+        data-last_name="<?= htmlspecialchars($u['last_name']) ?>"
         data-username="<?= htmlspecialchars($u['username']) ?>"
         data-role="<?= $u['role'] ?>"
     >Edit</button>
@@ -128,7 +142,9 @@ button { cursor: pointer; }
         <span class="close" id="closeAdd">&times;</span>
         <h2>Add Employee</h2>
         <form method="POST">
-            <input type="text" name="full_name" placeholder="Full Name" required>
+            <input type="text" name="first_name" placeholder="First Name" required>
+            <input type="text" name="middle_name" placeholder="Middle Name (Optional)">
+            <input type="text" name="last_name" placeholder="Last Name" required>
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <select name="role" required>
@@ -149,7 +165,9 @@ button { cursor: pointer; }
         <h2>Edit Employee</h2>
         <form method="POST">
             <input type="hidden" name="id" id="edit_id">
-            <input type="text" name="full_name" id="edit_full_name" required>
+            <input type="text" name="first_name" id="edit_first_name" required>
+            <input type="text" name="middle_name" id="edit_middle_name">
+            <input type="text" name="last_name" id="edit_last_name" required>
             <input type="text" name="username" id="edit_username" required>
             <select name="role" id="edit_role">
                 <option value="ADMIN">ADMIN</option>
@@ -179,7 +197,9 @@ var editButtons = document.getElementsByClassName("editBtn");
 Array.from(editButtons).forEach(btn => {
     btn.onclick = function() {
         document.getElementById("edit_id").value = this.dataset.id;
-        document.getElementById("edit_full_name").value = this.dataset.full_name;
+        document.getElementById("edit_first_name").value = this.dataset.first_name;
+        document.getElementById("edit_middle_name").value = this.dataset.middle_name;
+        document.getElementById("edit_last_name").value = this.dataset.last_name;
         document.getElementById("edit_username").value = this.dataset.username;
         document.getElementById("edit_role").value = this.dataset.role;
         editModal.style.display = "block";

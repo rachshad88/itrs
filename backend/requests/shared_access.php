@@ -7,7 +7,7 @@ require_once __DIR__ . "/../config/db.php";
 
 try {
     $stmt = $pdo->prepare("
-        SELECT id, request_code, client_name, office, issue, status, created_at
+        SELECT id, request_code, office, issue, status, created_at
         FROM requests
         ORDER BY created_at DESC
     ");

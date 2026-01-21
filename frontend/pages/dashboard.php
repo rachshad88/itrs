@@ -2,7 +2,7 @@
 session_start();
 require "../../backend/config/db.php";
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'TECHNICIAN') {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'TECHNICIAN' && $_SESSION['role'] !== 'ADMIN') {
     header("Location: ../../frontend/pages/index.php");
     exit;
 }
@@ -10,12 +10,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'TECHNICIAN') {
 $userId = $_SESSION['user_id'];
 
 // Show:
-// 1. Unassigned requests
+// 1. Unassigned PENDING requests (excluding CANCELLED)
 // 2. OR requests already accepted by this technician
 $sql = "
 SELECT *
 FROM requests
-WHERE assigned_to IS NULL
+WHERE (assigned_to IS NULL AND status != 'CANCELLED')
    OR assigned_to = ?
 ORDER BY created_at DESC
 ";
@@ -91,7 +91,6 @@ $counts = $countStmt->fetch();
         <thead>
             <tr>
                 <th>Request Code</th>
-                <th>Client Name</th>
                 <th>Office</th>
                 <th>Issue</th>
                 <th>Status</th>
@@ -104,20 +103,23 @@ $counts = $countStmt->fetch();
 <?php foreach ($requests as $r): ?>
 <tr>
     <td><?= $r['request_code'] ?></td>
-    <td><?= htmlspecialchars($r['client_name']) ?></td>
     <td><?= htmlspecialchars($r['office']) ?></td>
     <td><?= htmlspecialchars($r['issue']) ?></td>
     <td><?= $r['status'] ?></td>
     <td><?= htmlspecialchars($r['created_at']) ?></td>
     <td><?= htmlspecialchars($r['completed_at']) ?></td>
     <td>
-       <?php if ($r['assigned_to'] == null): ?>
+       <?php if ($r['status'] === 'CANCELLED'): ?>
+        Request Cancelled
+    <?php elseif ($r['assigned_to'] == null): ?>
         <form action="../../backend/requests/accept_request.php" method="POST">
             <input type="hidden" name="request_id" value="<?= $r['id'] ?>">
             <button type="submit">Accept</button>
         </form>
+    <?php elseif ($r['status'] === 'IN_PROGRESS'): ?>
+        <button type="button" class="mark-done-btn" data-request-code="<?= $r['request_code'] ?>" onclick="openFinishModal(this)">Mark Done</button>
     <?php else: ?>
-        Assigned to you
+        Completed
     <?php endif; ?>
     </td>
 </tr>
@@ -126,6 +128,145 @@ $counts = $countStmt->fetch();
 
     </table>
 </div>
+
+<!-- Finish Request Modal -->
+<div id="finishModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeFinishModal()">&times;</span>
+        <h2>Request Completion Status</h2>
+        <p>Please mark the status of this repair:</p>
+        <div class="modal-buttons" style="margin-bottom: 20px;">
+            <button type="button" class="btn-repaired" onclick="selectRepairStatus('repaired')" style="margin-right: 10px;">Repaired</button>
+            <button type="button" class="btn-beyond-repair" onclick="selectRepairStatus('beyond repair')">Beyond Repair</button>
+        </div>
+        
+        <div id="selectedStatus" style="font-weight: bold; margin-bottom: 15px;"></div>
+
+        <label for="remarks">Remarks</label>
+        <textarea id="remarks" name="remarks" style="width: 100%; height: 60px; margin-bottom: 10px;"></textarea>
+
+        <label for="recommendation">Recommendation</label>
+        <textarea id="recommendation" name="recommendation" style="width: 100%; height: 60px; margin-bottom: 15px;"></textarea>
+
+        <button type="button" onclick="submitFinishRequest()" style="width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px;">Submit</button>
+    </div>
+</div>
+
+<style>
+    .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 400px;
+        border-radius: 8px;
+    }
+
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-btn:hover {
+        color: black;
+    }
+
+    .btn-repaired, .btn-beyond-repair {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-repaired {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .btn-beyond-repair {
+        background-color: #f44336;
+        color: white;
+    }
+</style>
+
+<script>
+let currentRequestCode = '';
+let selectedRepairStatus = '';
+
+function openFinishModal(button) {
+    currentRequestCode = button.getAttribute('data-request-code');
+    selectedRepairStatus = '';
+    document.getElementById('remarks').value = '';
+    document.getElementById('recommendation').value = '';
+    document.getElementById('selectedStatus').textContent = '';
+    document.getElementById('finishModal').style.display = 'block';
+}
+
+function closeFinishModal() {
+    document.getElementById('finishModal').style.display = 'none';
+    currentRequestCode = '';
+    selectedRepairStatus = '';
+}
+
+function selectRepairStatus(status) {
+    selectedRepairStatus = status;
+    document.getElementById('selectedStatus').textContent = 'Status: ' + (status === 'repaired' ? 'Repaired' : 'Beyond Repair');
+}
+
+function submitFinishRequest() {
+    if (!selectedRepairStatus) {
+        alert('Please select a repair status');
+        return;
+    }
+
+    const remarks = document.getElementById('remarks').value;
+    const recommendation = document.getElementById('recommendation').value;
+
+    const formData = new FormData();
+    formData.append('request_code', currentRequestCode);
+    formData.append('finish_status', selectedRepairStatus);
+    formData.append('remarks', remarks);
+    formData.append('recommendation', recommendation);
+
+    fetch('../../backend/requests/request_finish.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Close modal if user clicks outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById('finishModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+
 <script src="../assets/js/dashboard.js"></script>
 
 </body>

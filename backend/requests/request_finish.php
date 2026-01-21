@@ -12,6 +12,8 @@ try {
 
     $finish_status = trim($_POST['finish_status'] ?? '');
     $request_code = trim($_POST['request_code'] ?? '');
+    $remarks = trim($_POST['remarks'] ?? '');
+    $recommendation = trim($_POST['recommendation'] ?? '');
 
     if ($finish_status === '' || $request_code === '') {
         echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
@@ -21,9 +23,9 @@ try {
     // Convert status to lowercase for enum values
     $finish_value = strtolower(str_replace(' ', ' ', $finish_status));
 
-    // Update the request status to DONE, set finished column, and record completed_at timestamp
-    $stmt = $pdo->prepare("UPDATE requests SET status = 'DONE', finished = ?, completed_at = NOW() WHERE request_code = ?");
-    $stmt->execute([$finish_value, $request_code]);
+    // Update the request status to DONE, set finished column, remarks, recommendation, and record completed_at timestamp
+    $stmt = $pdo->prepare("UPDATE requests SET status = 'DONE', finished = ?, remarks = ?, recommendation = ?, completed_at = NOW() WHERE request_code = ?");
+    $stmt->execute([$finish_value, $remarks, $recommendation, $request_code]);
 
     echo json_encode(['status' => 'success', 'message' => 'Request marked as complete']);
 } catch (PDOException $e) {

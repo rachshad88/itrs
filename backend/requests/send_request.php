@@ -22,16 +22,13 @@ try {
         exit;
     }
 
-    $client_name     = trim($_POST['client_name'] ?? '');
     $office          = trim($_POST['office'] ?? '');
     $unit            = trim($_POST['unit'] ?? '');
     $semester        = trim($_POST['semester'] ?? '');
     $issue           = trim($_POST['issue'] ?? '');
-    $remarks         = trim($_POST['remarks'] ?? '');
-    $recommendation  = trim($_POST['recommendation'] ?? '');
     $created_by      = $_SESSION['user_id'];
 
-    if ($client_name === '' || $office === '' || $issue === '') {
+    if ($office === '' || $issue === '') {
         echo json_encode([
             "status" => "error",
             "message" => "Required fields missing"
@@ -63,21 +60,18 @@ try {
 
     $sql = "
         INSERT INTO requests
-        (request_code, created_by, client_name, office, unit, semester, issue, remarks, recommendation, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')
+        (request_code, created_by, office, unit, semester, issue, status)
+        VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
     ";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $request_code,
         $created_by,
-        $client_name,
         $office,
         $unit,
         $semester,
-        $issue,
-        $remarks,
-        $recommendation
+        $issue
     ]);
 
     echo json_encode([

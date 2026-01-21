@@ -24,7 +24,7 @@ $user_role = $_SESSION['role'] ?? ''; // get role from session
         <li><a href="requested.php">Requested</a></li>
         <?php endif; ?>
 
-         <?php if ($user_role === 'TECHNICIAN'): ?>
+         <?php if ($user_role === 'TECHNICIAN' || $user_role === 'ADMIN'): ?>
         <li><a href="reports.php">Accomplishment Reports</a></li>
          <?php endif; ?>
 
@@ -36,6 +36,9 @@ $user_role = $_SESSION['role'] ?? ''; // get role from session
             <li><a href="user_management.php">User Management</a></li>
         <?php endif; ?>
 
+        <li><a href="http://192.168.110.16" target="_blank" rel="no_opener">Go CSF</a></li>
+
         <li><a href="../../backend/config/logout.php">Logout</a></li>
+        
     </ul>
 </nav>
