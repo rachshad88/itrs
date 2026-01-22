@@ -1,0 +1,18 @@
+[2026-01-21 08:26:05] Emitting: requestCreated - ID: 22, Code: IT-2026-0022
+[2026-01-21 08:26:05] Success: /emit/request_created - HTTP 200
+[2026-01-21 08:26:09] Emitting: requestAccepted - ID: 22, Assigned to: 2
+[2026-01-21 08:26:09] Success: /emit/request_accepted - HTTP 200
+[2026-01-21 08:26:15] Emitting: requestFinished - ID: 22
+[2026-01-21 08:26:15] Success: /emit/request_finished - HTTP 200
+[2026-01-22 01:15:46] Emitting: requestCreated - ID: 23, Code: IT-2026-0023
+[2026-01-22 01:15:48] CURL Error: Connection timed out after 2009 milliseconds - Endpoint: /emit/request_created
+[2026-01-22 01:15:57] Emitting: requestAccepted - ID: 23, Assigned to: 2
+[2026-01-22 01:15:59] CURL Error: Connection timed out after 2001 milliseconds - Endpoint: /emit/request_accepted
+[2026-01-22 01:16:04] Emitting: requestFinished - ID: 23
+[2026-01-22 01:16:06] CURL Error: Connection timed out after 2017 milliseconds - Endpoint: /emit/request_finished
+[2026-01-22 01:25:12] Emitting: requestCreated - ID: 24, Code: IT-2026-0024
+[2026-01-22 01:25:12] Success: /emit/request_created - HTTP 200
+[2026-01-22 01:25:17] Emitting: requestAccepted - ID: 24, Assigned to: 2
+[2026-01-22 01:25:17] Success: /emit/request_accepted - HTTP 200
+[2026-01-22 01:25:26] Emitting: requestFinished - ID: 24
+[2026-01-22 01:25:26] Success: /emit/request_finished - HTTP 200

@@ -8,8 +8,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'TECHNICIAN' && $_SESS
 }
 
 $userId = $_SESSION['user_id'];
+$userRole = $_SESSION['role'];
 
-// Show:
+// If admin, redirect to admin dashboard
+if ($userRole === 'ADMIN') {
+    header("Location: admin-dashboard.php");
+    exit;
+}
+
+// Show for TECHNICIAN only:
 // 1. Unassigned PENDING requests (excluding CANCELLED)
 // 2. OR requests already accepted by this technician
 $sql = "
@@ -40,6 +47,46 @@ $countStmt = $pdo->prepare($countSql);
 $countStmt->execute([$userId, $userId, $userId, $userId]);
 $counts = $countStmt->fetch();
 
+$filterType = $_GET['filter'] ?? 'daily';
+$selectedDate = $_GET['date'] ?? date('Y-m-d');
+$showDone = $_GET['show_done'] ?? '1'; // 1 = show, 0 = hide
+$reportData = [];
+
+// Determine date range based on filter
+$endDate = date('Y-m-d');
+switch($filterType) {
+    case 'daily':
+        $startDate = $selectedDate;
+        $endDate = $selectedDate;
+        break;
+    case 'weekly':
+        $startDate = date('Y-m-d', strtotime('-7 days'));
+        break;
+    case 'monthly':
+        $startDate = date('Y-m-01');
+        break;
+    default:
+        $startDate = $selectedDate;
+        $endDate = $selectedDate;
+        $filterType = 'daily';
+}
+
+// Filter requests based on date range
+$filteredRequests = array_filter($requests, function($request) use ($startDate, $endDate, $showDone) {
+    $requestDate = date('Y-m-d', strtotime($request['created_at']));
+    $inDateRange = ($requestDate >= $startDate && $requestDate <= $endDate);
+    
+    // Filter out DONE requests if show_done is 0
+    if ($showDone == '0' && $request['status'] === 'DONE') {
+        return false;
+    }
+    
+    return $inDateRange;
+});
+
+$requests = $filteredRequests;
+
+
 ?>
 
 
@@ -55,9 +102,32 @@ $counts = $countStmt->fetch();
 <body>
 
 
-
     <div class="main-content">
         <h1>Technician Dashboard</h1>
+
+        
+   <div class="filter-section">
+        <div class="filter-buttons">
+            <a href="?filter=daily&date=<?= $selectedDate ?>&show_done=<?= $showDone ?>" class="filter-btn <?= $filterType === 'daily' ? 'active' : '' ?>">Daily</a>
+            <a href="?filter=weekly&date=<?= $selectedDate ?>&show_done=<?= $showDone ?>" class="filter-btn <?= $filterType === 'weekly' ? 'active' : '' ?>">Weekly</a>
+            <a href="?filter=monthly&date=<?= $selectedDate ?>&show_done=<?= $showDone ?>" class="filter-btn <?= $filterType === 'monthly' ? 'active' : '' ?>">Monthly</a>
+        </div>
+
+        <div class="filter-controls">
+            <div class="date-picker-group">
+                <label for="dateFilter">Select Date:</label>
+                <input type="date" id="dateFilter" value="<?= $selectedDate ?>" onchange="applyDateFilter()">
+            </div>
+
+            <div class="toggle-group">
+                <label for="showDoneToggle">
+                    <input type="checkbox" id="showDoneToggle" <?= $showDone == '1' ? 'checked' : '' ?> onchange="toggleShowDone()">
+                    Show Completed Requests
+                </label>
+            </div>
+        </div>
+    </div>
+        
 
         <div class="stats-boxes">
         <div class="stat-card">
@@ -101,7 +171,7 @@ $counts = $countStmt->fetch();
         </thead>
        <tbody>
 <?php foreach ($requests as $r): ?>
-<tr>
+<tr data-request-id="<?= $r['id'] ?>" data-status="<?= $r['status'] ?>" data-created="<?= date('Y-m-d', strtotime($r['created_at'])) ?>">
     <td><?= $r['request_code'] ?></td>
     <td><?= htmlspecialchars($r['office']) ?></td>
     <td><?= htmlspecialchars($r['issue']) ?></td>
@@ -268,6 +338,61 @@ window.onclick = function(event) {
 </script>
 
 <script src="../assets/js/dashboard.js"></script>
+
+<script>
+    // Filter functions
+    function applyDateFilter() {
+        const date = document.getElementById('dateFilter').value;
+        const showDone = document.getElementById('showDoneToggle').checked ? '1' : '0';
+        const filterType = document.querySelector('.filter-btn.active')?.textContent.toLowerCase() || 'daily';
+        window.location.href = `?filter=${filterType}&date=${date}&show_done=${showDone}`;
+    }
+
+    function toggleShowDone() {
+        const date = document.getElementById('dateFilter').value;
+        const showDone = document.getElementById('showDoneToggle').checked ? '1' : '0';
+        const filterType = document.querySelector('.filter-btn.active')?.textContent.toLowerCase() || 'daily';
+        window.location.href = `?filter=${filterType}&date=${date}&show_done=${showDone}`;
+    }
+</script>
+
+<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+<script src="../../frontend/assets/js/realtime.js"></script>
+<script>
+    // Function to refresh the dashboard data
+    function refreshDashboard() {
+        location.reload();
+    }
+
+    window.addEventListener('load', function() {
+        realtimeClient.init(<?php echo $_SESSION['user_id']; ?>);
+        realtimeClient.requestNotificationPermission();
+
+        // Listen for any request updates
+        document.addEventListener('request-updated', function(event) {
+            console.log('Dashboard received request update:', event.detail);
+            refreshDashboard();
+        });
+
+        // Listen for request accepted
+        document.addEventListener('request-accepted', function(event) {
+            console.log('Request accepted:', event.detail);
+            refreshDashboard();
+        });
+
+        // Listen for request finished
+        document.addEventListener('request-finished', function(event) {
+            console.log('Request finished:', event.detail);
+            refreshDashboard();
+        });
+
+        // Listen for request cancelled
+        document.addEventListener('request-cancelled', function(event) {
+            console.log('Request cancelled:', event.detail);
+            refreshDashboard();
+        });
+    });
+</script>
 
 </body>
 </html>

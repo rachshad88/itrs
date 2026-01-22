@@ -2,6 +2,7 @@
 session_start();
 require __DIR__ . "/../config/db.php";
 require __DIR__ . "/ticket_code.php";
+require __DIR__ . "/../config/websocket.php";
 
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -74,6 +75,11 @@ try {
         $issue
     ]);
 
+    $request_id = $pdo->lastInsertId();
+
+    // Emit websocket event for real-time update
+    $wsEmitter->requestCreated($request_id, $request_code, $created_by, $office, $issue);
+
     echo json_encode([
         "status" => "success",
         "request_code" => $request_code
@@ -87,3 +93,4 @@ try {
     ]);
     exit;
 }
+?>

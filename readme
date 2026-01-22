@@ -78,3 +78,6 @@ ipconfig - get the IPv4 Address
 
 pati ito i-run mo
 ngrok http 8000
+
+cd c:\xampp\htdocs\itrs\realtime
+node .\server.js

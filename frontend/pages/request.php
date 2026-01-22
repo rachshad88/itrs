@@ -54,5 +54,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'CLIENT') {
         </div>
 
     <script src="../assets/js/send_request.js"></script>
+    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+<script src="../../frontend/assets/js/realtime.js"></script>
+<script>
+    window.addEventListener('load', function() {
+        realtimeClient.init(<?php echo $_SESSION['user_id']; ?>);
+        realtimeClient.requestNotificationPermission();
+    });
+</script>
 </body>
 </html>

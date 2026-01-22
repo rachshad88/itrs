@@ -86,10 +86,10 @@ $counts = $countStmt->fetch();
         </thead>
        <tbody>
 <?php foreach ($requests as $r): ?>
-<tr>
+<tr data-request-id="<?= $r['id'] ?>" data-request-code="<?= $r['request_code'] ?>">
     <td><?= $r['request_code'] ?></td>
     <td><?= htmlspecialchars($r['issue']) ?></td>
-    <td><?= $r['status'] ?></td>
+    <td class="status-cell"><?= $r['status'] ?></td>
     <td><?= htmlspecialchars($r['created_at']) ?></td>
     <td><?= htmlspecialchars($r['completed_at']) ?></td>
     <td>
@@ -108,6 +108,88 @@ $counts = $countStmt->fetch();
 
     </table>
 </div>
+
+<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+<script src="../../frontend/assets/js/realtime.js"></script>
+<script>
+    // Function to refresh the requested page
+    function refreshRequestedPage() {
+        location.reload();
+    }
+
+    window.addEventListener('load', function() {
+        realtimeClient.init(<?php echo $_SESSION['user_id']; ?>);
+        realtimeClient.requestNotificationPermission();
+
+        // Listen for request acceptance - update when technician accepts
+        document.addEventListener('request-accepted', function(event) {
+            console.log('Your request was accepted:', event.detail);
+            updateRequestInDOM(event.detail.request_id, 'IN_PROGRESS');
+        });
+
+        // Listen for general request updates
+        document.addEventListener('request-updated', function(event) {
+            console.log('Requested page received request update:', event.detail);
+            // Only update if it's about a status change
+            if (event.detail.event === 'accepted') {
+                updateRequestInDOM(event.detail.request_id, 'IN_PROGRESS');
+            } else if (event.detail.event === 'finished') {
+                updateRequestInDOM(event.detail.request_id, 'DONE');
+            } else if (event.detail.event === 'cancelled') {
+                updateRequestInDOM(event.detail.request_id, 'CANCELLED');
+            }
+        });
+
+        // Listen for request finished
+        document.addEventListener('request-finished', function(event) {
+            console.log('Your request was finished:', event.detail);
+            updateRequestInDOM(event.detail.request_id, 'DONE');
+        });
+
+        // Listen for request cancelled
+        document.addEventListener('request-cancelled', function(event) {
+            console.log('Your request was cancelled:', event.detail);
+            updateRequestInDOM(event.detail.request_id, 'CANCELLED');
+        });
+    });
+
+    function updateRequestInDOM(requestId, newStatus) {
+        const row = document.querySelector(`tr[data-request-id="${requestId}"]`);
+        if (!row) return;
+
+        const statusCell = row.querySelector('.status-cell');
+        const actionCell = row.querySelector('td:last-child');
+        
+        if (statusCell) {
+            statusCell.textContent = newStatus;
+        }
+
+        if (actionCell) {
+            if (newStatus === 'DONE') {
+                actionCell.innerHTML = '<span>-</span>';
+            }
+        }
+
+        // Update stats
+        updateStats();
+    }
+
+    function updateStats() {
+        // Recalculate stats from current DOM state
+        let pending = 0, progress = 0, done = 0;
+        document.querySelectorAll('tbody tr .status-cell').forEach(cell => {
+            const status = cell.textContent.trim();
+            if (status === 'PENDING') pending++;
+            else if (status === 'IN_PROGRESS') progress++;
+            else if (status === 'DONE') done++;
+        });
+        
+        const statCards = document.querySelectorAll('.stat-card p');
+        if (statCards[0]) statCards[0].textContent = pending;
+        if (statCards[1]) statCards[1].textContent = progress;
+        if (statCards[2]) statCards[2].textContent = done;
+    }
+</script>
 
 </body>
 </html>
